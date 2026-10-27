@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BEright Automations | Ultra-Tier Engineering & Architecture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Dynamic Design System Root Variables */
+    :root {
+      --bg-base: #030712;
+      --bg-gradient: radial-gradient(circle at 50% 20%, #0d1527 0%, #030712 100%);
+      --card-bg: rgba(15, 23, 42, 0.55);
+      --card-border: rgba(56, 189, 248, 0.18);
+      --card-hover-border: rgba(56, 189, 248, 0.7);
+      --accent-primary: #00F0FF;
+      --accent-secondary: #FF007F;
+      --accent-tertiary: #A855F7;
+      --glow-color: rgba(0, 240, 255, 0.35);
+      --text-main: #F8FAFC;
+      --text-sub: #94A3B8;
+      --surface-glass: rgba(15, 23, 42, 0.75);
+    }
+
+    body {
+      background: var(--bg-base);
+      background-image: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background 0.5s ease, color 0.3s ease;
+    }
+
+    /* Interactive Ambient Canvas */
+    #ambient-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 3D Glass Card Core */
+    .card-3d-wrapper {
+      perspective: 1200px;
+    }
+
+    .card-3d {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      transition: transform 0.15s ease-out, border-color 0.3s ease, box-shadow 0.3s ease;
+      transform-style: preserve-3d;
+      position: relative;
+    }
+
+    .card-3d:hover {
+      border-color: var(--card-hover-border);
+      box-shadow: 0 20px 45px -10px var(--glow-color);
+    }
+
+    .card-content-depth {
+      transform: translateZ(35px);
+    }
+
+    .card-flare {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.12) 0%, transparent 65%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+
+    .card-3d:hover .card-flare {
+      opacity: 1;
+    }
+
+    /* Glowing Badge & Accents */
+    .neon-pill {
+      border: 1px solid var(--accent-primary);
+      box-shadow: 0 0 15px -3px var(--accent-primary);
+      color: var(--accent-primary);
+    }
+
+    .neon-text-gradient {
+      background: linear-gradient(135deg, #FFFFFF 0%, var(--accent-primary) 50%, var(--accent-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .neon-btn {
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      box-shadow: 0 0 25px -4px var(--accent-primary);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .neon-btn:hover {
+      box-shadow: 0 0 35px 2px var(--accent-secondary);
+      transform: translateY(-2px);
+    }
+
+    /* Custom Input Style */
+    .custom-input {
+      background: rgba(3, 7, 18, 0.65);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      transition: all 0.25s ease;
+    }
+
+    .custom-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 15px -2px var(--glow-color);
+      outline: none;
+    }
+
+    /* Stealth Trigger */
+    .stealth-admin-trigger {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      z-index: 50;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .stealth-admin-trigger:hover {
+      background: var(--accent-primary);
+      box-shadow: 0 0 10px var(--accent-primary);
+      transform: scale(1.4);
+    }
+
+    /* Glass Scrollbar */
+    ::-webkit-scrollbar {
+      width: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #030712;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-primary);
+    }
+  </style>
+</head>
+<body class="relative selection:bg-cyan-500 selection:text-black">
+
+  <!-- Interactive 3D Ambient Particles Canvas -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    
+    <!-- Top Brand Header & Status Bar -->
+    <header class="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 mb-8 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xl neon-pill bg-black/40 font-display">
+          B
+        </div>
+        <div>
+          <span class="text-xl font-extrabold tracking-wider font-display uppercase">BEright</span>
+          <span class="text-xs ml-2 px-2.5 py-0.5 rounded-full font-semibold border border-white/20 text-white/70">AUTOMATIONS</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 text-xs text-slate-400">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          Pipelines Online
+        </span>
+        <span class="hidden md:inline px-3 py-1 rounded-full bg-white/5 border border-white/10" id="current-theme-pill">Theme: Cyberpunk Cyan</span>
+      </div>
+    </header>
+
+    <!-- Hero / Headline Section -->
+    <section class="text-center py-12 md:py-20 relative">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-slate-300 font-semibold mb-6 neon-pill">
+        ✨ High-Precision Cloud Automations &amp; Full-Stack Systems
+      </div>
+      <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight font-display mb-6 leading-tight">
+        Next-Level Architectures for <br>
+        <span class="neon-text-gradient">Visionary Enterprises.</span>
+      </h1>
+      <p class="max-w-3xl mx-auto text-base sm:text-lg text-slate-400 leading-relaxed font-light mb-10">
+        From reactive bespoke Web Apps, AI Chatbots, and automated CRMs to autonomous Google Sheets database engines and real-time Telegram webhook pipelines. Explore our full suite of enterprise services below.
+      </p>
+      
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a href="#services-grid" class="px-8 py-3.5 rounded-xl text-sm font-bold uppercase tracking-wider custom-input hover:border-cyan-400 hover:text-cyan-300 transition-all">
+          Explore 16+ Solutions
+        </a>
+        <a href="#inquiry-form-section" class="px-8 py-3.5 rounded-xl text-sm font-bold uppercase tracking-wider text-black neon-btn">
+          Start Instant Consultation
+        </a>
+      </div>
+    </section>
+
+    <!-- Services Section Header -->
+    <section id="services-grid" class="pt-10 pb-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 border-b border-white/10 pb-6 gap-4">
+        <div>
+          <h2 class="text-2xl sm:text-4xl font-extrabold font-display neon-text-gradient">Core Capabilities</h2>
+          <p class="text-slate-400 text-sm mt-1">Hover &amp; interact with the 3D sensory nodes to explore architecture details.</p>
+        </div>
+        <div class="text-xs text-slate-400 uppercase tracking-widest font-semibold">
+          16 Master Modules Loaded
+        </div>
+      </div>
+
+      <!-- 16 3D Sensory Tilt Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="cards-container">
+        
+        <!-- Card 1 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-cyan-500/10 border border-cyan-500/30">⚡</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Web Application Dev</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Ultra-fast single-page web applications, interactive dashboards, and client portals built with responsive modular code.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-cyan-400 font-semibold tracking-wide">
+              <span>SPA / Cloud Frontends</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-pink-500/10 border border-pink-500/30">🤖</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Interactive AI Chatbots</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Intelligent conversational agents for Telegram, WhatsApp, and websites that automate tier-1 inquiries, orders, and customer support.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-pink-400 font-semibold tracking-wide">
+              <span>Natural NLP / BotFather</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-purple-500/10 border border-purple-500/30">📝</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Dynamic Registration Forms</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Modern onboarding forms with conditional logic, multi-step validation, phone formatting, and instant anti-spam filtering.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-purple-400 font-semibold tracking-wide">
+              <span>Real-time Validation</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-emerald-500/10 border border-emerald-500/30">📋</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Smart Data Collection</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Automated surveys, field report intake, and feedback collection instruments piped directly into structured databases with zero lag.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-emerald-400 font-semibold tracking-wide">
+              <span>Field &amp; Audit Logs</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-amber-500/10 border border-amber-500/30">🏢</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Custom CRM Systems</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Tailored customer relation hubs featuring pipeline stages, automated deal notifications, one-click WhatsApp chats, and follow-ups.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-amber-400 font-semibold tracking-wide">
+              <span>Pipeline &amp; Deal Flow</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-blue-500/10 border border-blue-500/30">📦</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Inventory Management</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Barcode-enabled stock trackers, low-inventory alert bots, automated warehouse intake sheets, and supplier purchase order automation.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-blue-400 font-semibold tracking-wide">
+              <span>Stock &amp; Supply Chain</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 7 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-rose-500/10 border border-rose-500/30">💳</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">POS (Point of Sale)</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Responsive browser-based retail and service checkout interfaces that generate receipts and sync instantly with central stock ledgers.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-rose-400 font-semibold tracking-wide">
+              <span>Fast Terminal UI</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 8 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-cyan-400/10 border border-cyan-400/30">⚙️</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Apps Script Automation</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Serverless cloud functions running 24/7 on Google Cloud to sync Gmail attachments, Calendar bookings, Sheets, and Webhooks.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-cyan-300 font-semibold tracking-wide">
+              <span>Zero-Server Compute</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 9 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-teal-500/10 border border-teal-500/30">📊</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Sheets Database Engines</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Complex relational tables using Apps Script and Google formulas (QUERY, ARRAYFORMULA, INDEX/MATCH) for low-cost relational storage.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-teal-400 font-semibold tracking-wide">
+              <span>Relational Storage</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 10 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-indigo-500/10 border border-indigo-500/30">🧾</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Automated Invoicing &amp; PDF</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Instant PDF invoice generation from Google Docs/Slides templates, auto-saved to Google Drive folders and dispatched via email/Telegram.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-indigo-400 font-semibold tracking-wide">
+              <span>Drive &amp; PDF Engines</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 11 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-fuchsia-500/10 border border-fuchsia-500/30">🔗</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Webhook &amp; REST APIs</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Bi-directional connectors bridging Stripe, PayPal, Meta Ads, WhatsApp Cloud, Telegram Bot API, and custom ERP software.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-fuchsia-400 font-semibold tracking-wide">
+              <span>Seamless Sync</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 12 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-yellow-500/10 border border-yellow-500/30">📈</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Real-time BI Dashboards</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Executive summary screens, live metrics, revenue projections, and instant CSV/Excel client-side data exporters.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-yellow-400 font-semibold tracking-wide">
+              <span>Analytics &amp; KPI</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 13 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-red-500/10 border border-red-500/30">🏭</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Industrial IoT Logging</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Surface preparation inspections, blast &amp; coating QA logs, ambient sensor logging, and automated factory batch documentation.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-red-400 font-semibold tracking-wide">
+              <span>QA &amp; Industrial Systems</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 14 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-sky-500/10 border border-sky-500/30">🎓</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Bespoke Educational Portals</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Interactive bilingual quiz engines, multimedia course trackers, practice exam testing suites, and real-time scoreboards.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-sky-400 font-semibold tracking-wide">
+              <span>EdTech Engines</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 15 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-green-500/10 border border-green-500/30">🚀</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Zero-Cost Cloud Architecture</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">High-availability systems deployed to GitHub Pages and Google Cloud that run permanently without recurring monthly server fees.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-green-400 font-semibold tracking-wide">
+              <span>100% Free Tier Stack</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 16 -->
+        <div class="card-3d-wrapper">
+          <div class="card-3d p-6 rounded-2xl h-full flex flex-col justify-between">
+            <div class="card-flare"></div>
+            <div class="card-content-depth">
+              <div class="text-3xl mb-4 p-3 w-fit rounded-xl bg-orange-500/10 border border-orange-500/30">🛡️</div>
+              <h3 class="text-lg font-bold font-display text-white mb-2">Secure Gateway &amp; Audit</h3>
+              <p class="text-xs text-slate-400 leading-relaxed mb-4">Role-based access management, encrypted session tokens, revision histories, and automated audit logs for sensitive datasets.</p>
+            </div>
+            <div class="flex items-center justify-between pt-4 border-t border-white/5 text-[11px] text-orange-400 font-semibold tracking-wide">
+              <span>Hardened Gateways</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Project Intake Form Section -->
+    <section id="inquiry-form-section" class="py-16">
+      <div class="max-w-4xl mx-auto card-3d p-8 sm:p-12 rounded-3xl relative overflow-hidden border border-white/15">
+        <div class="card-flare"></div>
+
+        <div class="text-center mb-10">
+          <div class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-white/5 border border-white/10 mb-3 text-cyan-400">
+            Instant Pipeline Dispatch
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-extrabold font-display neon-text-gradient">Register Your Project Scope</h2>
+          <p class="text-slate-400 text-sm max-w-xl mx-auto mt-2">
+            Submissions instantly log into our secure Google Sheets database and ping our Telegram Bot dispatch center.
+          </p>
+        </div>
+
+        <form id="project-intake-form" class="space-y-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label for="client-name" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Full Name *</label>
+              <input type="text" id="client-name" required placeholder="e.g. Alexander Vance" class="w-full px-4 py-3 rounded-xl custom-input text-sm">
+            </div>
+
+            <div>
+              <label for="client-email" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Corporate Email *</label>
+              <input type="email" id="client-email" required placeholder="alexander@company.com" class="w-full px-4 py-3 rounded-xl custom-input text-sm">
+            </div>
+
+            <div>
+              <label for="client-phone" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Phone / WhatsApp Number *</label>
+              <input type="tel" id="client-phone" required placeholder="+48 123 456 789" class="w-full px-4 py-3 rounded-xl custom-input text-sm">
+            </div>
+
+            <div>
+              <label for="client-country" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Country / Region *</label>
+              <input type="text" id="client-country" required placeholder="e.g. Poland, UAE, USA, Germany" class="w-full px-4 py-3 rounded-xl custom-input text-sm">
+            </div>
+          </div>
+
+          <div>
+            <label for="client-service" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Required Architectural Service *</label>
+            <select id="client-service" required class="w-full px-4 py-3 rounded-xl custom-input text-sm bg-slate-900">
+              <option value="" disabled selected>Select from 16 specialized modules...</option>
+              <option value="Web Application Development">Web Application Development</option>
+              <option value="Interactive AI Chatbots & Agents">Interactive AI Chatbots & Agents</option>
+              <option value="Dynamic Registration Forms">Dynamic Registration Forms</option>
+              <option value="Smart Data Collection Forms">Smart Data Collection Forms</option>
+              <option value="Custom CRM Systems">Custom CRM Systems</option>
+              <option value="Inventory & Stock Management">Inventory & Stock Management</option>
+              <option value="POS (Point of Sale) Systems">POS (Point of Sale) Systems</option>
+              <option value="Google Apps Script Serverless Automation">Google Apps Script Serverless Automation</option>
+              <option value="Relational Google Sheets Database Engines">Relational Google Sheets Database Engines</option>
+              <option value="Automated Invoicing & PDF Cloud Storage">Automated Invoicing & PDF Cloud Storage</option>
+              <option value="Webhook & REST API Integrations">Webhook & REST API Integrations</option>
+              <option value="Real-time BI Analytics & Dashboards">Real-time BI Analytics & Dashboards</option>
+              <option value="Industrial IoT & Production Logging">Industrial IoT & Production Logging</option>
+              <option value="Bespoke Educational Portals">Bespoke Educational Portals</option>
+              <option value="Zero-Cost Cloud Architecture Deployment">Zero-Cost Cloud Architecture Deployment</option>
+              <option value="Other Bespoke Engineering">Other Bespoke Engineering</option>
+            </select>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label for="client-details" class="block text-xs font-bold uppercase tracking-wider text-slate-400">Detailed Scope &amp; Workflow Requirements *</label>
+              <span id="word-count-display" class="text-xs text-slate-500 font-mono">0 / 1000 words</span>
+            </div>
+            <textarea id="client-details" required rows="6" placeholder="Provide a deep description of your required process, fields, triggers, or integrations (up to 1,000 words)..." class="w-full p-4 rounded-xl custom-input text-sm"></textarea>
+          </div>
+
+          <button type="submit" id="form-submit-btn" class="w-full py-4 rounded-xl text-black font-extrabold uppercase tracking-widest text-sm neon-btn flex items-center justify-center gap-2 cursor-pointer">
+            <span>Transmit Project Scope</span>
+            <span>⚡</span>
+          </button>
+
+          <div id="form-feedback" class="hidden p-4 rounded-xl text-center text-sm font-semibold border"></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-20 py-8 border-t border-white/10 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 BEright Automations. High-Availability Serverless Engineering.</div>
+      <div class="flex items-center gap-4 text-slate-400">
+        <span>Telegram API Gateway</span>
+        <span>•</span>
+        <span>Google Apps Script</span>
+        <span>•</span>
+        <span>100% Free Tier Host</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Stealth Invisible Admin Trigger (Bottom Right Corner) -->
+  <div id="stealth-trigger" class="stealth-admin-trigger" title="Engine Gate"></div>
+
+  <!-- Secret PIN Verification Modal -->
+  <div id="pin-modal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-50 hidden flex items-center justify-center p-4">
+    <div class="max-w-xs w-full card-3d p-6 rounded-2xl border border-white/20 text-center">
+      <div class="w-12 h-12 rounded-full bg-cyan-500/10 border border-cyan-500/40 text-cyan-400 flex items-center justify-center mx-auto mb-4 text-xl">
+        🔒
+      </div>
+      <h3 class="text-base font-bold font-display text-white mb-1">Administrative Gateway</h3>
+      <p class="text-xs text-slate-400 mb-4">Enter master security clearance</p>
+      
+      <input type="password" id="admin-pin-input" maxlength="6" placeholder="••••" class="w-full text-center tracking-[0.5em] text-lg font-mono py-2.5 rounded-xl custom-input mb-3" autocomplete="off">
+      
+      <div id="pin-error-msg" class="text-rose-400 text-xs mb-3 hidden">Invalid authorization code.</div>
+
+      <div class="flex gap-2">
+        <button id="cancel-pin-btn" class="w-1/2 py-2 rounded-xl text-xs font-semibold custom-input text-slate-400 hover:text-white">Cancel</button>
+        <button id="unlock-pin-btn" class="w-1/2 py-2 rounded-xl text-xs font-bold text-black neon-btn">Authorize</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 50-Theme Admin Control Studio Modal -->
+  <div id="admin-studio-modal" class="fixed inset-0 bg-black/90 backdrop-blur-2xl z-50 hidden flex flex-col p-4 sm:p-8">
+    <div class="max-w-6xl w-full mx-auto card-3d p-6 sm:p-8 rounded-3xl border border-white/20 flex flex-col h-full overflow-hidden">
+      
+      <!-- Studio Header -->
+      <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+            <h2 class="text-xl sm:text-2xl font-extrabold font-display neon-text-gradient">Master Theme Studio</h2>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Select any of the 50 engineered chromatic themes. Changes persist globally.</p>
+        </div>
+        <button id="close-studio-btn" class="px-4 py-2 rounded-xl text-xs font-bold custom-input text-slate-300 hover:text-white hover:border-red-500/50">
+          ✕ Exit Studio
+        </button>
+      </div>
+
+      <!-- Quick Action Utilities -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4 p-3 rounded-xl bg-white/5 border border-white/10 text-xs">
+        <div class="text-slate-300">
+          <strong>Authorized Administrator:</strong> PIN 5047 Session Active
+        </div>
+        <div class="flex gap-2">
+          <button id="reset-theme-btn" class="px-3 py-1.5 rounded-lg custom-input hover:border-cyan-400 text-cyan-300">
+            Reset to Cyberpunk Default
+          </button>
+        </div>
+      </div>
+
+      <!-- 50 Theme Grid (Scrollable) -->
+      <div class="flex-1 overflow-y-auto pr-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3" id="themes-grid">
+        <!-- 50 themes generated via JS -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ================================================================
+    // 1. CONFIGURATION & STATE
+    // ================================================================
+    // Paste your deployed Google Apps Script Web App URL here:
+    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxssbzRc0vVZTUmu1yf3GdD_q3zRSH0zvPoIu_Fl1gJMrtp_iN3YjfylVMMeCELbKCW/exec";
+    const SECRET_ADMIN_PIN = "5047";
+
+    // 50 Curated Aesthetic Themes
+    const THEMES_50 = [
+      { id: 1, name: "Cyberpunk Neon", bg: "#030712", card: "rgba(15, 23, 42, 0.65)", p: "#00F0FF", s: "#FF007F", glow: "rgba(0, 240, 255, 0.4)" },
+      { id: 2, name: "Royal Obsidian Gold", bg: "#080600", card: "rgba(28, 22, 10, 0.65)", p: "#FFD700", s: "#FF8C00", glow: "rgba(255, 215, 0, 0.35)" },
+      { id: 3, name: "Emerald Matrix", bg: "#02120a", card: "rgba(5, 30, 18, 0.65)", p: "#10B981", s: "#00FF88", glow: "rgba(16, 185, 129, 0.4)" },
+      { id: 4, name: "Tokyo Midnight", bg: "#060814", card: "rgba(16, 20, 48, 0.65)", p: "#6366F1", s: "#EC4899", glow: "rgba(99, 102, 241, 0.4)" },
+      { id: 5, name: "Solar Flare", bg: "#160502", card: "rgba(35, 12, 8, 0.65)", p: "#F97316", s: "#EF4444", glow: "rgba(249, 115, 22, 0.4)" },
+      { id: 6, name: "Arctic Ice Glacier", bg: "#020f18", card: "rgba(8, 28, 45, 0.65)", p: "#38BDF8", s: "#818CF8", glow: "rgba(56, 189, 248, 0.4)" },
+      { id: 7, name: "Dark Amethyst", bg: "#0f051d", card: "rgba(30, 12, 50, 0.65)", p: "#A855F7", s: "#E879F9", glow: "rgba(168, 85, 247, 0.4)" },
+      { id: 8, name: "Crimson Dragon", bg: "#150205", card: "rgba(35, 8, 14, 0.65)", p: "#F43F5E", s: "#BE123C", glow: "rgba(244, 63, 94, 0.4)" },
+      { id: 9, name: "Deep Ocean Trench", bg: "#010a15", card: "rgba(3, 20, 38, 0.65)", p: "#0284C7", s: "#2DD4BF", glow: "rgba(2, 132, 199, 0.4)" },
+      { id: 10, name: "Vaporwave Sunset", bg: "#120524", card: "rgba(36, 14, 65, 0.65)", p: "#FF00AA", s: "#00FFF0", glow: "rgba(255, 0, 170, 0.4)" },
+      
+      { id: 11, name: "Titanium Carbon", bg: "#0a0a0c", card: "rgba(24, 24, 27, 0.65)", p: "#E4E4E7", s: "#71717A", glow: "rgba(228, 228, 231, 0.3)" },
+      { id: 12, name: "Blood Ruby", bg: "#130206", card: "rgba(36, 6, 12, 0.65)", p: "#E11D48", s: "#FB7185", glow: "rgba(225, 29, 72, 0.4)" },
+      { id: 13, name: "Galactic Violet", bg: "#0a041c", card: "rgba(23, 11, 48, 0.65)", p: "#8B5CF6", s: "#C084FC", glow: "rgba(139, 92, 246, 0.4)" },
+      { id: 14, name: "Amber Horizon", bg: "#130900", card: "rgba(33, 18, 5, 0.65)", p: "#F59E0B", s: "#D97706", glow: "rgba(245, 158, 11, 0.4)" },
+      { id: 15, name: "Cyber Mint", bg: "#011311", card: "rgba(4, 33, 29, 0.65)", p: "#14B8A6", s: "#5EEAD4", glow: "rgba(20, 184, 166, 0.4)" },
+      { id: 16, name: "Starlight Silver", bg: "#090d16", card: "rgba(19, 27, 44, 0.65)", p: "#CBD5E1", s: "#94A3B8", glow: "rgba(203, 213, 225, 0.3)" },
+      { id: 17, name: "Supernova Orange", bg: "#150601", card: "rgba(38, 15, 6, 0.65)", p: "#FB923C", s: "#F43F5E", glow: "rgba(251, 146, 60, 0.4)" },
+      { id: 18, name: "Deep Forest Pine", bg: "#031209", card: "rgba(9, 32, 17, 0.65)", p: "#059669", s: "#34D399", glow: "rgba(5, 150, 105, 0.4)" },
+      { id: 19, name: "Cosmic Nebula", bg: "#090317", card: "rgba(24, 9, 44, 0.65)", p: "#D946EF", s: "#8B5CF6", glow: "rgba(217, 70, 239, 0.4)" },
+      { id: 20, name: "Lagoon Turquoise", bg: "#011217", card: "rgba(5, 30, 38, 0.65)", p: "#06B6D4", s: "#3B82F6", glow: "rgba(6, 182, 212, 0.4)" },
+
+      { id: 21, name: "Desert Mirage", bg: "#150c05", card: "rgba(35, 22, 12, 0.65)", p: "#FBBF24", s: "#F97316", glow: "rgba(251, 191, 36, 0.35)" },
+      { id: 22, name: "Black Panther", bg: "#000000", card: "rgba(18, 18, 20, 0.7)", p: "#818CF8", s: "#4F46E5", glow: "rgba(129, 140, 248, 0.35)" },
+      { id: 23, name: "Rose Quartz", bg: "#14060c", card: "rgba(35, 13, 24, 0.65)", p: "#F472B6", s: "#FDA4AF", glow: "rgba(244, 114, 182, 0.4)" },
+      { id: 24, name: "Aurora Borealis", bg: "#021319", card: "rgba(4, 30, 36, 0.65)", p: "#22D3EE", s: "#4ADE80", glow: "rgba(34, 211, 238, 0.4)" },
+      { id: 25, name: "Molten Lava", bg: "#160401", card: "rgba(41, 10, 4, 0.65)", p: "#DC2626", s: "#EA580C", glow: "rgba(220, 38, 38, 0.4)" },
+      { id: 26, name: "Electric Indigo", bg: "#08051e", card: "rgba(19, 13, 49, 0.65)", p: "#4F46E5", s: "#7C3AED", glow: "rgba(79, 70, 229, 0.4)" },
+      { id: 27, name: "Bioluminescent", bg: "#01150f", card: "rgba(4, 36, 27, 0.65)", p: "#00FFC4", s: "#00B8D9", glow: "rgba(0, 255, 196, 0.4)" },
+      { id: 28, name: "Velvet Plum", bg: "#110416", card: "rgba(32, 11, 41, 0.65)", p: "#C026D3", s: "#9333EA", glow: "rgba(192, 38, 211, 0.4)" },
+      { id: 29, name: "Solar Wind", bg: "#120800", card: "rgba(33, 17, 3, 0.65)", p: "#FDE047", s: "#FB923C", glow: "rgba(253, 224, 71, 0.35)" },
+      { id: 30, name: "Cyberpunk 2077", bg: "#0e0d01", card: "rgba(28, 27, 3, 0.65)", p: "#FCEE0A", s: "#00F0FF", glow: "rgba(252, 238, 10, 0.4)" },
+
+      { id: 31, name: "Quantum Blue", bg: "#020a1c", card: "rgba(7, 21, 48, 0.65)", p: "#2563EB", s: "#60A5FA", glow: "rgba(37, 99, 235, 0.4)" },
+      { id: 32, name: "Neon Lime", bg: "#071201", card: "rgba(18, 36, 4, 0.65)", p: "#84CC16", s: "#A3E635", glow: "rgba(132, 204, 22, 0.4)" },
+      { id: 33, name: "Synthwave Magenta", bg: "#170216", card: "rgba(39, 7, 37, 0.65)", p: "#E879F9", s: "#F43F5E", glow: "rgba(232, 121, 249, 0.4)" },
+      { id: 34, name: "Copper Bronze", bg: "#130906", card: "rgba(34, 18, 13, 0.65)", p: "#D97706", s: "#B45309", glow: "rgba(217, 119, 6, 0.35)" },
+      { id: 35, name: "Deep Cobalt", bg: "#03081c", card: "rgba(9, 18, 48, 0.65)", p: "#1D4ED8", s: "#38BDF8", glow: "rgba(29, 78, 216, 0.4)" },
+      { id: 36, name: "Spectral Ghost", bg: "#0a0d13", card: "rgba(21, 26, 36, 0.65)", p: "#94A3B8", s: "#E2E8F0", glow: "rgba(148, 163, 184, 0.3)" },
+      { id: 37, name: "Toxic Alien", bg: "#081502", card: "rgba(18, 38, 6, 0.65)", p: "#22C55E", s: "#FACC15", glow: "rgba(34, 197, 94, 0.4)" },
+      { id: 38, name: "Hyperdrive Pink", bg: "#17020d", card: "rgba(40, 6, 23, 0.65)", p: "#EC4899", s: "#F472B6", glow: "rgba(236, 72, 153, 0.4)" },
+      { id: 39, name: "Aquamarine Pearl", bg: "#011215", card: "rgba(4, 33, 38, 0.65)", p: "#2DD4BF", s: "#67E8F9", glow: "rgba(45, 212, 191, 0.4)" },
+      { id: 40, name: "Stygian Shadow", bg: "#020203", card: "rgba(14, 14, 18, 0.7)", p: "#64748B", s: "#38BDF8", glow: "rgba(100, 116, 139, 0.3)" },
+
+      { id: 41, name: "Phoenix Flame", bg: "#160501", card: "rgba(39, 13, 3, 0.65)", p: "#FF4500", s: "#FFD700", glow: "rgba(255, 69, 0, 0.4)" },
+      { id: 42, name: "Zen Jade", bg: "#04140b", card: "rgba(10, 36, 20, 0.65)", p: "#34D399", s: "#10B981", glow: "rgba(52, 211, 153, 0.35)" },
+      { id: 43, name: "Hyper Blue", bg: "#030d24", card: "rgba(8, 25, 59, 0.65)", p: "#3B82F6", s: "#1D4ED8", glow: "rgba(59, 130, 246, 0.4)" },
+      { id: 44, name: "Dark Cherry", bg: "#150208", card: "rgba(38, 6, 16, 0.65)", p: "#BE123C", s: "#FB7185", glow: "rgba(190, 18, 60, 0.4)" },
+      { id: 45, name: "Midnight Teal", bg: "#021115", card: "rgba(5, 31, 38, 0.65)", p: "#0F766E", s: "#2DD4BF", glow: "rgba(15, 118, 110, 0.4)" },
+      { id: 46, name: "Golden Sunset", bg: "#140801", card: "rgba(35, 18, 4, 0.65)", p: "#F59E0B", s: "#EC4899", glow: "rgba(245, 158, 11, 0.35)" },
+      { id: 47, name: "Neon Cyberpunk Red", bg: "#140104", card: "rgba(38, 4, 10, 0.65)", p: "#FF0055", s: "#FF5500", glow: "rgba(255, 0, 85, 0.4)" },
+      { id: 48, name: "Ultra Violet 3.0", bg: "#0c021c", card: "rgba(28, 8, 48, 0.65)", p: "#7E22CE", s: "#A855F7", glow: "rgba(126, 34, 206, 0.4)" },
+      { id: 49, name: "High-Voltage Amber", bg: "#120a00", card: "rgba(33, 20, 3, 0.65)", p: "#EAB308", s: "#CA8A04", glow: "rgba(234, 179, 8, 0.35)" },
+      { id: 50, name: "Absolute Pitch Black", bg: "#000000", card: "rgba(15, 15, 15, 0.8)", p: "#00F0FF", s: "#FFFFFF", glow: "rgba(0, 240, 255, 0.3)" }
+    ];
+
+    // ================================================================
+    // 2. THEME ENGINE APPLIER
+    // ================================================================
+    function applyTheme(theme) {
+      const root = document.documentElement;
+      root.style.setProperty('--bg-base', theme.bg);
+      root.style.setProperty('--bg-gradient', `radial-gradient(circle at 50% 20%, ${theme.card.replace('0.65', '0.2').replace('0.7', '0.2')} 0%, ${theme.bg} 100%)`);
+      root.style.setProperty('--card-bg', theme.card);
+      root.style.setProperty('--accent-primary', theme.p);
+      root.style.setProperty('--accent-secondary', theme.s);
+      root.style.setProperty('--glow-color', theme.glow);
+      root.style.setProperty('--card-border', `${theme.p}25`);
+      root.style.setProperty('--card-hover-border', `${theme.p}99`);
+
+      document.getElementById('current-theme-pill').textContent = `Theme: ${theme.name}`;
+      localStorage.setItem('beright_theme_id', theme.id);
+    }
+
+    // Init Stored Theme or Default
+    const savedThemeId = localStorage.getItem('beright_theme_id');
+    if (savedThemeId) {
+      const found = THEMES_50.find(t => t.id == savedThemeId);
+      if (found) applyTheme(found);
+    }
+
+    // Populate 50 Themes Grid in Admin Studio
+    const themesGrid = document.getElementById('themes-grid');
+    THEMES_50.forEach(theme => {
+      const btn = document.createElement('button');
+      btn.className = 'flex flex-col items-start p-3 rounded-xl border border-white/10 hover:border-cyan-400 bg-black/40 text-left transition-all';
+      btn.innerHTML = `
+        <div class="flex items-center gap-1.5 w-full mb-2">
+          <span class="w-3.5 h-3.5 rounded-full border border-white/20" style="background:${theme.p}"></span>
+          <span class="w-3.5 h-3.5 rounded-full border border-white/20" style="background:${theme.s}"></span>
+          <span class="ml-auto text-[10px] text-slate-500 font-mono">#${theme.id}</span>
+        </div>
+        <div class="text-xs font-bold text-white truncate w-full">${theme.name}</div>
+      `;
+      btn.addEventListener('click', () => {
+        applyTheme(theme);
+      });
+      themesGrid.appendChild(btn);
+    });
+
+    document.getElementById('reset-theme-btn').addEventListener('click', () => {
+      applyTheme(THEMES_50[0]);
+    });
+
+    // ================================================================
+    // 3. STEALTH ADMIN MODAL LOGIC (PIN: 5047)
+    // ================================================================
+    const stealthTrigger = document.getElementById('stealth-trigger');
+    const pinModal = document.getElementById('pin-modal');
+    const pinInput = document.getElementById('admin-pin-input');
+    const unlockBtn = document.getElementById('unlock-pin-btn');
+    const cancelPinBtn = document.getElementById('cancel-pin-btn');
+    const pinErrorMsg = document.getElementById('pin-error-msg');
+    const studioModal = document.getElementById('admin-studio-modal');
+    const closeStudioBtn = document.getElementById('close-studio-btn');
+
+    stealthTrigger.addEventListener('click', () => {
+      pinModal.classList.remove('hidden');
+      pinInput.value = '';
+      pinErrorMsg.classList.add('hidden');
+      setTimeout(() => pinInput.focus(), 100);
+    });
+
+    cancelPinBtn.addEventListener('click', () => {
+      pinModal.classList.add('hidden');
+    });
+
+    function verifyPin() {
+      if (pinInput.value === SECRET_ADMIN_PIN) {
+        pinModal.classList.add('hidden');
+        studioModal.classList.remove('hidden');
+      } else {
+        pinErrorMsg.classList.remove('hidden');
+        pinInput.value = '';
+        pinInput.focus();
+      }
+    }
+
+    unlockBtn.addEventListener('click', verifyPin);
+    pinInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') verifyPin();
+    });
+
+    closeStudioBtn.addEventListener('click', () => {
+      studioModal.classList.add('hidden');
+    });
+
+    // ================================================================
+    // 4. 3D CARD INTERACTIVE TILT PHYSICS
+    // ================================================================
+    const cards = document.querySelectorAll('.card-3d');
+    cards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = ((y - centerY) / centerY) * -12;
+        const rotateY = ((x - centerX) / centerX) * 12;
+
+        card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
+        card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      });
+    });
+
+    // ================================================================
+    // 5. WORD COUNTER & INTAKE FORM DISPATCH
+    // ================================================================
+    const detailsInput = document.getElementById('client-details');
+    const wordCountDisplay = document.getElementById('word-count-display');
+    const intakeForm = document.getElementById('project-intake-form');
+    const submitBtn = document.getElementById('form-submit-btn');
+    const formFeedback = document.getElementById('form-feedback');
+
+    detailsInput.addEventListener('input', () => {
+      const words = detailsInput.value.trim().split(/\s+/).filter(w => w.length > 0);
+      const count = words.length;
+      wordCountDisplay.textContent = `${count} / 1000 words`;
+      if (count > 1000) {
+        wordCountDisplay.classList.add('text-rose-400');
+        wordCountDisplay.classList.remove('text-slate-500');
+      } else {
+        wordCountDisplay.classList.remove('text-rose-400');
+        wordCountDisplay.classList.add('text-slate-500');
+      }
+    });
+
+    intakeForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const words = detailsInput.value.trim().split(/\s+/).filter(w => w.length > 0);
+      if (words.length > 1000) {
+        formFeedback.className = "p-4 rounded-xl text-center text-sm font-semibold border bg-rose-500/10 border-rose-500/30 text-rose-300";
+        formFeedback.textContent = "Please limit project details to 1,000 words or less.";
+        formFeedback.classList.remove('hidden');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span>Transmitting to Cloud...</span> <span class="animate-spin">⏳</span>`;
+      formFeedback.classList.add('hidden');
+
+      const payload = {
+        name: document.getElementById('client-name').value.trim(),
+        email: document.getElementById('client-email').value.trim(),
+        phone: document.getElementById('client-phone').value.trim(),
+        country: document.getElementById('client-country').value.trim(),
+        service: document.getElementById('client-service').value,
+        details: detailsInput.value.trim()
+      };
+
+      try {
+        const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+          formFeedback.className = "p-4 rounded-xl text-center text-sm font-semibold border bg-emerald-500/10 border-emerald-500/30 text-emerald-300";
+          formFeedback.textContent = "✓ Ingestion complete. Data registered into Google Sheets and Telegram Bot notified.";
+          formFeedback.classList.remove('hidden');
+          intakeForm.reset();
+          wordCountDisplay.textContent = "0 / 1000 words";
+        } else {
+          throw new Error(result.message || "Failed to process.");
+        }
+      } catch (err) {
+        formFeedback.className = "p-4 rounded-xl text-center text-sm font-semibold border bg-amber-500/10 border-amber-500/30 text-amber-300";
+        formFeedback.textContent = "Scope registered locally. (Verify your Google Apps Script URL endpoint).";
+        formFeedback.classList.remove('hidden');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>Transmit Project Scope</span> <span>⚡</span>`;
+      }
+    });
+
+    // ================================================================
+    // 6. AMBIENT PARTICLE CONSTELLATION CANVAS
+    // ================================================================
+    const canvas = document.getElementById('ambient-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class ParticleNode {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = (Math.random() - 0.5) * 0.4;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.x > canvas.width) this.x = 0;
+        if (this.y < 0) this.y = canvas.height;
+        if (this.y > canvas.height) this.y = 0;
+      }
+      draw() {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 45; i++) {
+      particles.push(new ParticleNode());
+    }
+
+    function renderLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 110) {
+            ctx.strokeStyle = `rgba(255, 255, 255, ${0.12 - dist / 110 * 0.12})`;
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(renderLoop);
+    }
+    renderLoop();
+  </script>
+</body>
+</html>
